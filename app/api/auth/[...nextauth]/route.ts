@@ -2,7 +2,11 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import type { NextAuthOptions } from "next-auth";
 
-const adminEmails = ["rwahabmoversuae@gmail.com", "itsmashal2006@gmail.com"];
+const adminEmails = [
+  "rwahabmoversuae@gmail.com",
+  "itsmashal2006@gmail.com",
+  "dubaiusedfurniture.ae@gmail.com",
+];
 
 const authOptions: NextAuthOptions = {
   providers: [
@@ -18,7 +22,7 @@ const authOptions: NextAuthOptions = {
       if (user.email && adminEmails.includes(user.email)) {
         return true;
       }
-      return `/dashboard/login?error=You are not authorized to access this application.`;
+      return `/login?error=You are not authorized to access this application.`;
     },
   },
 };

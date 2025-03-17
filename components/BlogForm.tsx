@@ -53,7 +53,7 @@ const BlogForm = ({ blog }: { blog?: BlogResponse }) => {
   const [Resource, setResource] = useState<
     CloudinaryUploadWidgetInfo | undefined
   >(undefined);
-  const [blogContent, setBlogContent] = useState<string>("");
+  const [blogContent, setBlogContent] = useState<string>(blog?.content || "");
   const [loading, setLoading] = useState(false);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [categories, setCategories] = useState<category[] | []>([]);

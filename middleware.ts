@@ -3,17 +3,21 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
-  const token = await getToken({ req, secret: process.env.JWT_SECRET });
+  const token = await getToken({ req });
+
+  // If not logged in and trying to access /dashboard, redirect to /login
   if (!token && url.pathname.startsWith("/dashboard")) {
-    NextResponse.redirect(new URL("/dashboard/login", url.origin).href);
-    return NextResponse.next();
+    return NextResponse.redirect(new URL("/login", url.origin));
   }
-  if (token && url.pathname.startsWith("/dashboard/login")) {
-    return NextResponse.redirect(new URL("/dashboard", url.origin).href);
+
+  // If logged in and trying to access /login, redirect to /dashboard
+  if (token && url.pathname.startsWith("/login")) {
+    return NextResponse.redirect(new URL("/dashboard", url.origin));
   }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/", "/login"],
 };
