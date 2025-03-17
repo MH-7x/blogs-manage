@@ -30,7 +30,7 @@ interface CustomFormFieldProps {
       };
       category: string;
     },
-    any,
+    Record<string, unknown>,
     undefined
   >;
   label: string;

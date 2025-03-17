@@ -1,13 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  AudioWaveform,
-  Bot,
-  Command,
-  GalleryVerticalEnd,
-  SquareTerminal,
-} from "lucide-react";
+import { Bot, GalleryVerticalEnd, SquareTerminal } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -19,14 +13,13 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
 
 // This is sample data.
 const data = {
   teams: [
     {
-      name: "Acme Inc",
+      name: "Dubai Used Furniture Inc",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
     },

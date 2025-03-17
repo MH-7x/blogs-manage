@@ -97,6 +97,7 @@ const BlogForm = ({ blog }: { blog?: BlogResponse }) => {
       }
     } catch (error) {
       toast.error("An error occurred while submitting the blog.");
+      console.error(error);
     } finally {
       setLoading(false);
     }

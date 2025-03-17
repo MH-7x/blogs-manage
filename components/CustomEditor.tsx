@@ -10,7 +10,7 @@ const CusEditor = ({
   setContent: (value: string) => void;
   initialContent?: string;
 }) => {
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<Editor | null>(null);
 
   return (
     <div className="mt-5 w-full">

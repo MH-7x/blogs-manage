@@ -52,7 +52,8 @@ export async function GET(req: NextRequest) {
   const id = searchParams.get("id") || null;
   try {
     await dbConnect();
-    let query: any = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const query: any = {};
 
     if (category) {
       const isValidCategory = await categoriesModel.findOne({ name: category });
