@@ -53,7 +53,6 @@ export default async function createBlog(data: {
     if (!result.success) {
       throw new Error(result.message);
     }
-
     return {
       message: `Blog ${data.isUpdate ? "Updated" : "created"} Successfully`,
       success: true,

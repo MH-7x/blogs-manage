@@ -136,6 +136,7 @@ export async function DELETE(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   const data = await req.json();
+
   try {
     await dbConnect();
     await blogsModel.findByIdAndUpdate(
