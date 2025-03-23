@@ -30,8 +30,11 @@ export async function GET() {
         },
       },
     ]);
-
-    return NextResponse.json({ success: true, data: blogs });
+    console.log("Blogs From /list-all API" , blogs)
+    if(blogs.length > 0 ){
+    return NextResponse.json({ success: true, data: blogs });  
+    }
+    return NextResponse.json({ success: false, message : "no blogs found" });
   } catch (error) {
     console.error("Error fetching blogs:", error);
     return NextResponse.json(

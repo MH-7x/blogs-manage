@@ -11,6 +11,7 @@ async function getData(): Promise<{ data: Blog[] } | { error: string }> {
       throw new Error("Failed to get blogs - " + response.statusText);
     const results = await response.json();
     if (!results.success) throw new Error(results.message);
+    console.log("Results in Page :: ", results);
     return { data: results.data as Blog[] };
   } catch (error) {
     return {
