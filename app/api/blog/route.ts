@@ -3,7 +3,7 @@ import blogsModel from "@/models/blogs.model";
 import categoriesModel from "@/models/categories.model";
 import { NextRequest, NextResponse } from "next/server";
 
-interface blogData {
+export interface blogData {
   title: string;
   caption: string;
   category: string;

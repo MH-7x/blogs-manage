@@ -22,7 +22,6 @@ async function getData(): Promise<{ data: Blog[] } | { error: string }> {
 
 export default async function BlogListPage() {
   const result = await getData();
-  console.log("results", result);
 
   return (
     <div className="container mx-auto p-5">

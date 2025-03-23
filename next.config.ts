@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
+      allowedOrigins: [
+        "https://dubaiusedfurniture.ae",
+        "http://localhost:3000",
+      ],
       bodySizeLimit: "10mb",
     },
   },
