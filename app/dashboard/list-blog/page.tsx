@@ -4,7 +4,9 @@ import { DataTable } from "./data-table";
 
 async function getData(): Promise<{ data: Blog[] } | { error: string }> {
   try {
-    const response = await fetch(`${process.env.PUBLIC_URL}/api/list-all`);
+    const response = await fetch(`${process.env.PUBLIC_URL}/api/list-all`, {
+      cache: "no-store",
+    });
     if (!response.ok)
       throw new Error("Failed to get blogs - " + response.statusText);
     const results = await response.json();
@@ -19,6 +21,7 @@ async function getData(): Promise<{ data: Blog[] } | { error: string }> {
 
 export default async function BlogListPage() {
   const result = await getData();
+  console.log("results", result);
 
   return (
     <div className="container mx-auto p-5">
