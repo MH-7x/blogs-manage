@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
 
   try {
     await dbConnect();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = {};
 
     if (category) {
