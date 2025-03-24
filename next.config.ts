@@ -9,12 +9,29 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async headers() {
+    return [
+      {
+        source: "/api/:path",
+        headers: [
+          {
+            key: "Access-Control-Allow-Origin",
+            value: process.env.ALLOWED_ORIGIN || "http://localhost:3000",
+          },
+          {
+            key: "Access-Control-Allow-Methods",
+            value: "GET, POST, PUT, DELETE, OPTIONS",
+          },
+          {
+            key: "Access-Control-Allow-Headers",
+            value: "Content-Type",
+          },
+        ],
+      },
+    ];
+  },
   experimental: {
     serverActions: {
-      allowedOrigins: [
-        "https://dubaiusedfurniture.ae",
-        "http://localhost:3000",
-      ],
       bodySizeLimit: "10mb",
     },
   },

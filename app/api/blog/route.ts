@@ -2,25 +2,6 @@ import dbConnect from "@/lib/DBConnect";
 import blogsModel from "@/models/blogs.model";
 import categoriesModel from "@/models/categories.model";
 import { NextRequest, NextResponse } from "next/server";
-const allowedOrigins = [
-  "https://dubaiusedfurniture.ae",
-  "http://localhost:3000",
-];
-
-function getCorsHeaders(origin: string | null) {
-  if (!origin || !allowedOrigins.includes(origin)) {
-    return {
-      "Access-Control-Allow-Origin": "",
-      "Access-Control-Allow-Methods": "",
-      "Access-Control-Allow-Headers": "Content-Type",
-    };
-  }
-  return {
-    "Access-Control-Allow-Origin": origin,
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-  };
-}
 
 export interface blogData {
   title: string;
@@ -38,15 +19,37 @@ export interface blogData {
   };
 }
 
+export async function POST(req: NextRequest) {
+  const data: blogData = await req.json();
+
+  //zod validation TODO
+
+  try {
+    await dbConnect();
+    const newBlog = new blogsModel(data);
+    await newBlog.save();
+    return NextResponse.json({
+      success: true,
+      message: "blog created successfully",
+    });
+  } catch (error) {
+    console.error("Blog Creating Error ::", error);
+    return NextResponse.json({
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to create blog, server error",
+    });
+  }
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const origin = req.headers.get("origin");
-
   const category = searchParams.get("category") || null;
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = parseInt(searchParams.get("limit") || "10", 10);
   const id = searchParams.get("id") || null;
-
   try {
     await dbConnect();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -55,95 +58,83 @@ export async function GET(req: NextRequest) {
     if (category) {
       const isValidCategory = await categoriesModel.findOne({ name: category });
       if (!isValidCategory) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: `Cannot find blog for ${category} category`,
-          },
-          { headers: getCorsHeaders(origin) }
-        );
+        return NextResponse.json({
+          success: false,
+          message: `Cannot find blog for ${category} category`,
+        });
       }
       query.category = category;
     }
-
     if (id) {
       const blog = await blogsModel
         .findById({ _id: id })
         .select("-author -slug -createdAt -updatedAt -__v");
-      if (!blog) {
-        return NextResponse.json(
-          { message: "Cannot found blog details", success: false },
-          { headers: getCorsHeaders(origin) }
-        );
-      }
-      return NextResponse.json(
-        { message: "Blog details fetched!", success: true, data: blog },
-        { headers: getCorsHeaders(origin) }
-      );
+      if (!blog)
+        return NextResponse.json({
+          message: "Cannot found blog details",
+          success: false,
+        });
+      return NextResponse.json({
+        message: "Blog details fetched!",
+        success: true,
+        data: blog,
+      });
     }
-
     const skip = (page - 1) * limit;
     const blogs = await blogsModel.find(query).skip(skip).limit(limit);
     const totalBlogs = await blogsModel.countDocuments(query);
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Blogs fetched successfully!",
-        data: blogs,
-        pagination: {
-          total: totalBlogs,
-          page,
-          limit,
-          totalPages: Math.ceil(totalBlogs / limit),
-        },
+    return NextResponse.json({
+      success: true,
+      message: "Blogs fetched successfully!",
+      data: blogs,
+      pagination: {
+        total: totalBlogs,
+        page,
+        limit,
+        totalPages: Math.ceil(totalBlogs / limit),
       },
-      { headers: getCorsHeaders(origin) }
-    );
+    });
   } catch (error) {
     console.error("Error fetching blogs ::", error);
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to fetch blogs, server error",
-      },
-      { headers: getCorsHeaders(origin) }
-    );
+    return NextResponse.json({
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch blogs, server error",
+    });
   }
 }
 
-export async function POST(req: NextRequest) {
-  const origin = req.headers.get("origin");
-  const data: blogData = await req.json();
+export async function DELETE(req: NextRequest) {
+  const { id } = await req.json();
+  if (!id)
+    return NextResponse.json({
+      success: false,
+      message: "No id is received",
+    });
 
   try {
     await dbConnect();
-    const newBlog = new blogsModel(data);
-    await newBlog.save();
-    return NextResponse.json(
-      { success: true, message: "Blog created successfully" },
-      { headers: getCorsHeaders(origin) }
-    );
+    await blogsModel.findByIdAndDelete({ _id: id });
+    return NextResponse.json({
+      success: true,
+      message: "deleted successfully",
+    });
   } catch (error) {
-    console.error("Blog Creating Error ::", error);
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to create blog, server error",
-      },
-      { headers: getCorsHeaders(origin) }
-    );
+    console.error("Error deleting blog ::", error);
+    return NextResponse.json({
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to delete blog, server error",
+    });
   }
 }
 
 export async function PUT(req: NextRequest) {
-  const origin = req.headers.get("origin");
   const data = await req.json();
 
   try {
@@ -161,66 +152,22 @@ export async function PUT(req: NextRequest) {
         content: data.content,
         FeaturedImage: data.FeaturedImage,
       },
-      { new: true }
-    );
-    return NextResponse.json(
-      { message: "Blog updated successfully", success: true },
-      { headers: getCorsHeaders(origin) }
-    );
-  } catch (error) {
-    console.error("Blog updating error", error);
-    return NextResponse.json(
       {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to update - server error",
-        success: false,
-      },
-      { headers: getCorsHeaders(origin) }
+        new: true,
+      }
     );
-  }
-}
-
-export async function DELETE(req: NextRequest) {
-  const origin = req.headers.get("origin");
-  const { id } = await req.json();
-
-  if (!id) {
-    return NextResponse.json(
-      { success: false, message: "No id received" },
-      { headers: getCorsHeaders(origin) }
-    );
-  }
-
-  try {
-    await dbConnect();
-    await blogsModel.findByIdAndDelete({ _id: id });
-    return NextResponse.json(
-      { success: true, message: "Deleted successfully" },
-      { headers: getCorsHeaders(origin) }
-    );
+    return NextResponse.json({
+      message: "category updated successfully",
+      success: true,
+    });
   } catch (error) {
-    console.error("Error deleting blog ::", error);
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to delete blog, server error",
-      },
-      { headers: getCorsHeaders(origin) }
-    );
+    console.error("blog updating error", error);
+    return NextResponse.json({
+      message:
+        error instanceof Error
+          ? error.message
+          : "failed to update -server error",
+      success: true,
+    });
   }
-}
-
-export async function OPTIONS(req: NextRequest) {
-  const origin = req.headers.get("origin");
-  return NextResponse.json(
-    {},
-    {
-      headers: getCorsHeaders(origin),
-    }
-  );
 }
