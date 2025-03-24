@@ -50,6 +50,7 @@ export async function GET(req: NextRequest) {
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = parseInt(searchParams.get("limit") || "10", 10);
   const id = searchParams.get("id") || null;
+  const slug = searchParams.get("slug") || null;
   try {
     await dbConnect();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,6 +79,23 @@ export async function GET(req: NextRequest) {
         message: "Blog details fetched!",
         success: true,
         data: blog,
+      });
+    }
+    if (slug) {
+      const blog = await blogsModel.findOne({
+        slug,
+      });
+
+      if (!blog) {
+        return NextResponse.json({
+          message: "Cannot found blog",
+          success: false,
+        });
+      }
+      return NextResponse.json({
+        message: "blog details found",
+        success: true,
+        blog: blog,
       });
     }
     const skip = (page - 1) * limit;
