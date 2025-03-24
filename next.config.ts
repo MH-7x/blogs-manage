@@ -1,10 +1,5 @@
 import type { NextConfig } from "next";
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  process.env.ALLOWED_ORIGIN || "",
-].filter(Boolean); // Remove empty values
-
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -21,7 +16,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Access-Control-Allow-Origin",
-            value: allowedOrigins.join(", "),
+            value: "*",
           },
           {
             key: "Access-Control-Allow-Methods",
