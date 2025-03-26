@@ -24,8 +24,11 @@ export async function GET() {
         $project: {
           _id: 1, // Blog ID
           title: 1, // Blog Title
+          caption: 1, // Blog Caption
+          slug: 1,
           image: "$FeaturedImage", // Rename FeaturedImage to image
           category: { $ifNull: ["$categoryData.name", "Uncategorized"] }, // Category Name
+          createdAt: 1,
         },
       },
     ]);

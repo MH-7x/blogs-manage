@@ -51,6 +51,7 @@ export async function GET(req: NextRequest) {
   const limit = parseInt(searchParams.get("limit") || "10", 10);
   const id = searchParams.get("id") || null;
   const slug = searchParams.get("slug") || null;
+
   try {
     await dbConnect();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -64,7 +65,23 @@ export async function GET(req: NextRequest) {
           message: `Cannot find blog for ${category} category`,
         });
       }
-      query.category = category;
+      const blogsByCategory = await blogsModel
+        .find({
+          category: isValidCategory._id,
+        })
+        .populate("category", "name")
+        .select("-__v -content -author -seo");
+      if (!blogsByCategory.length) {
+        return NextResponse.json({
+          success: false,
+          message: `Cannot find blog for ${category} category`,
+        });
+      }
+      return NextResponse.json({
+        success: true,
+        message: `Blogs for ${category} category fetched successfully!`,
+        data: blogsByCategory,
+      });
     }
     if (id) {
       const blog = await blogsModel
@@ -82,9 +99,12 @@ export async function GET(req: NextRequest) {
       });
     }
     if (slug) {
-      const blog = await blogsModel.findOne({
-        slug,
-      });
+      const blog = await blogsModel
+        .findOne({
+          slug,
+        })
+        .populate("category", "name")
+        .select("-slug  -__v");
 
       if (!blog) {
         return NextResponse.json({
@@ -99,7 +119,12 @@ export async function GET(req: NextRequest) {
       });
     }
     const skip = (page - 1) * limit;
-    const blogs = await blogsModel.find(query).skip(skip).limit(limit);
+    const blogs = await blogsModel
+      .find(query)
+      .populate("category", "name")
+      .select("-content -author -seo  -__v")
+      .skip(skip)
+      .limit(limit);
     const totalBlogs = await blogsModel.countDocuments(query);
 
     return NextResponse.json({

@@ -76,4 +76,8 @@ const blogSchema = new Schema<IBlog>(
   { timestamps: true }
 );
 
+blogSchema.pre("save", function (next) {
+  this.slug = this.title.toLowerCase().split(" ").join("-");
+  next();
+});
 export default models.Blog || model<IBlog>("Blog", blogSchema);
