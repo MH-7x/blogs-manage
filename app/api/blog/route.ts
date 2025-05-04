@@ -98,14 +98,16 @@ export async function GET(req: NextRequest) {
         data: blog,
       });
     }
+    
     if (slug) {
+      console.log("Comming Slug :: " + slug );
       const blog = await blogsModel
         .findOne({
-          slug,
+          slug : slug,
         })
         .populate("category", "name")
-        .select("-slug  -__v");
-
+        .select("-__v");
+      console.log("Process Done :: " + blog);
       if (!blog) {
         return NextResponse.json({
           message: "Cannot found blog",
